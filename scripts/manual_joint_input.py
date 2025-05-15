@@ -37,7 +37,7 @@ def main():
                 j1, j2 = map(float, inp.strip().split())
                 node.set_angles_deg(j1, j2)
             except ValueError:
-                print("❌ Invalid input. Please enter two numbers like: 30 45")
+                print("Invalid input. Please enter two numbers like: 30 45")
     except KeyboardInterrupt:
         pass
 
