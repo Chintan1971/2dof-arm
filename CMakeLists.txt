@@ -8,9 +8,20 @@ endif()
 # Find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclpy REQUIRED)
+find_package(ros2_control REQUIRED)
+find_package(ros_ign_gazebo REQUIRED)
+find_package(ros_ign_bridge REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(controller_manager REQUIRED)
+find_package(hardware_interface REQUIRED)
 find_package(urdf REQUIRED)
 find_package(rviz2 REQUIRED)
 find_package(robot_state_publisher REQUIRED)
+find_package(ros_gz_sim REQUIRED)
+find_package(ros_gz_bridge REQUIRED)
+find_package(ros_gz_interfaces REQUIRED)
+find_package(gz_ros2_control REQUIRED)
+
 #find_package(joint_state_publisher REQUIRED)
 
 if(BUILD_TESTING)
@@ -30,12 +41,21 @@ endif()
 # ament_target_dependencies(your_node rclcpp urdf rviz2 robot_state_publisher joint_state_publisher)
 # install(TARGETS your_node DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY urdf launch
+install(DIRECTORY urdf launch config
 DESTINATION share/${PROJECT_NAME}/
 )
 install(PROGRAMS
 scripts/manual_joint_input.py
 DESTINATION lib/${PROJECT_NAME}
+)
+
+ament_export_dependencies(
+  rclcpp
+  controller_manager
+  hardware_interface
+  urdf
+  rviz2
+  robot_state_publisher
 )
 
 

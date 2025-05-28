@@ -100,4 +100,30 @@
         <dynamics damping="0.5" friction="0.1"/>
     </joint>
 
+            
+   <ros2_control name="GazeboSimSystem" type="system">
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+        <joint name="joint1">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+        <joint name="joint2">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+        </joint>
+    </ros2_control>
+
+    <gazebo>
+        <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <robot_param>robot_description</robot_param>
+            <robot_param_node>robot_state_publisher</robot_param_node>
+            <parameters>/home/chintan/ros2_ws/install/my_robot_arm/share/my_robot_arm/config/controller.yaml</parameters>
+            <controller_manager_name>controller_manager</controller_manager_name>
+        </plugin>
+    </gazebo>
+
 </robot>
