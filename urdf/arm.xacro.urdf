@@ -121,7 +121,7 @@
         <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
             <robot_param>robot_description</robot_param>
             <robot_param_node>robot_state_publisher</robot_param_node>
-            <parameters>/home/chintan/ros2_ws/install/my_robot_arm/share/my_robot_arm/config/controller.yaml</parameters>
+            <parameters>/home/chintan/ros2_ws/install/my_robot_arm/share/my_robot_arm/config/pidcontroller.yaml</parameters>
             <controller_manager_name>controller_manager</controller_manager_name>
         </plugin>
     </gazebo>
