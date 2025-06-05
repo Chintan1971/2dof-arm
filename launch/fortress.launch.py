@@ -16,6 +16,7 @@ def generate_launch_description():
     gz_args = LaunchConfiguration('gz_args', default='')
     urdf_file = os.path.join(pkg_my_robot_arm, 'urdf', 'arm.xacro.urdf')
     config_file = os.path.join(pkg_my_robot_arm, 'config', 'controller.yaml')
+    cube_urdf = os.path.join(pkg_my_robot_arm, 'urdf', 'movable_object.xacro.urdf')
 
     with open(urdf_file, 'r') as f:
         robot_description_content = f.read() # Renamed to avoid conflict if publishing
@@ -50,6 +51,23 @@ def generate_launch_description():
         output='screen'
     )
 
+    spawn_cube = Node(
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+            '-name','movable_object',
+            '-file', cube_urdf,
+            '-allow_renaming', 'true',
+            '-x', '5.0', '-y', '0.0', '-z', '0.5',
+        ]
+    )
+
+    move_object = Node(
+        package='my_robot_arm',
+        executable='move_object.py',
+        name='move_object',
+        output='screen'
+    )
     # ros2_control node and controller spawners (should remain largely the same)
     # Ensure use_sim_time is True for nodes that need it with Gazebo
     ros2_control_node = Node(
@@ -76,7 +94,9 @@ def generate_launch_description():
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+                   '/world/default/entity/set_pose@ros_gz_interfaces/msg/EntityState[gz.msgs.EntityState'
+                   ],
         output='screen'
     )
     return LaunchDescription([
@@ -104,6 +124,11 @@ def generate_launch_description():
         bridge,
         robot_description_publisher, # Publish robot description first
         spawn_robot,
+        TimerAction(
+            period=1.0,  # Wait for Gazebo to start
+            actions=[spawn_cube]  # Spawn the cube after a delay
+        ),
+        move_object
         # ros2_control_node
         
         # joint_state_broadcaster_spawner,
