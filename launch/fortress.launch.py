@@ -95,7 +95,7 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-                   '/world/default/entity/set_pose@ros_gz_interfaces/msg/EntityState[gz.msgs.EntityState'
+                   '/world/empty/set_pose@ros_gz_interfaces/srv/SetEntityPose'
                    ],
         output='screen'
     )
@@ -128,7 +128,11 @@ def generate_launch_description():
             period=1.0,  # Wait for Gazebo to start
             actions=[spawn_cube]  # Spawn the cube after a delay
         ),
-        move_object
+        TimerAction(
+            period=3.0,  
+            actions=[move_object]  # Start moving the object after a delay
+        )
+    
         # ros2_control_node
         
         # joint_state_broadcaster_spawner,
