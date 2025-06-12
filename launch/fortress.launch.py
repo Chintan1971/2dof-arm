@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import IncludeLaunchDescription,SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription,DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import ExecuteProcess, TimerAction, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
@@ -33,20 +33,36 @@ def generate_launch_description():
         output='screen',
         parameters=[{'robot_description':robot_description_content}] # Important for Gazebo Sim
     )
+
+    world = LaunchConfiguration('world')
+
+    default_world = os.path.join(
+        get_package_share_directory('my_robot_arm'),
+        'worlds', 
+        'empty.world'
+    )
+
+    world_arg = DeclareLaunchArgument(
+        'world',
+        default_value=default_world,
+        description='world to load'
+    )
     
     gz_sim_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-            launch_arguments=[('gz_args',[gz_args, ' -r -v 1 empty.sdf'])])
+            launch_arguments={'gz_args': ['-r -v4 ',world],'on_exit_shutdown': 'true'}.items()
+        )
+            # [('gz_args',[gz_args, ' -r -v 1 empty.sdf'])])
         # launch_arguments={'gz_args': '-r empty.sdf'}.items(), # Example: Load an empty world or your specific world
-    
 
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
             '-topic', 'robot_description', 
-            '-name', 'my_robot_arm','-allow_renaming', 'true'
+            '-name', 'my_robot_arm',
+            '-allow_renaming', 'true'
         ],
         output='screen'
     )
@@ -95,9 +111,17 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-                   '/world/empty/set_pose@ros_gz_interfaces/srv/SetEntityPose'
+                   '/world/empty/set_pose@ros_gz_interfaces/srv/SetEntityPose',
+                   '/camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+                   '/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
                    ],
         output='screen'
+    )
+
+    ros_gz_image_bridge = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=['/camera/image_raw']
     )
     return LaunchDescription([
 
@@ -105,6 +129,7 @@ def generate_launch_description():
         #     name='LD_LIBRARY_PATH',
         #     value=gz_plugin_path + ':' + os.environ.get('LD_LIBRARY_PATH', '')
         # ),
+        world_arg,  # Declare the world argument
         gz_sim_launch,
         # ExecuteProcess(
         #     cmd=['ign','gazebo','-r','--verbose'],
@@ -122,6 +147,7 @@ def generate_launch_description():
             )
         ),
         bridge,
+        ros_gz_image_bridge,
         robot_description_publisher, # Publish robot description first
         spawn_robot,
         TimerAction(

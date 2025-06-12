@@ -41,7 +41,7 @@ endif()
 # ament_target_dependencies(your_node rclcpp urdf rviz2 robot_state_publisher joint_state_publisher)
 # install(TARGETS your_node DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY urdf launch config
+install(DIRECTORY urdf launch config worlds
 DESTINATION share/${PROJECT_NAME}/
 )
 install(PROGRAMS
