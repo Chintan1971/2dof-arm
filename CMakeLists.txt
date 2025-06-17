@@ -54,6 +54,11 @@ scripts/move_object.py
 DESTINATION lib/${PROJECT_NAME}
 )
 
+install(PROGRAMS
+scripts/object_detect.py
+DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_export_dependencies(
   rclcpp
   controller_manager

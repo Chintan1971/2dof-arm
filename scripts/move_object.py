@@ -6,8 +6,6 @@ from rclpy.node import Node
 from geometry_msgs.msg import Pose, Point, Quaternion
 from ros_gz_interfaces.srv import SetEntityPose 
 import random
-
-
 import math
 
 class ObjectMoverClient(Node):
